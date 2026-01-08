@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyUniform | Broward County</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; overflow-x: hidden; }
+
+        /* --- ANIMATIONS --- */
+        @keyframes subtle-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes fade-in-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pop { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .animate-float { animation: subtle-float 4s ease-in-out infinite; }
+        .animate-in { opacity: 0; animation: fade-in-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        .school-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .school-card:not(.coming-soon):hover { transform: translateY(-10px) scale(1.03); background-color: rgba(255, 255, 255, 0.15); border-color: #6366f1; box-shadow: 0 25px 50px -12px rgba(99, 102, 241, 0.3); }
+        .coming-soon { opacity: 0.4; cursor: not-allowed; filter: grayscale(1); }
+
+        /* --- MANNEQUIN --- */
+        .mannequin-container { position: relative; width: 440px; height: 540px; display: flex; justify-content: center; }
+        .shirt-body { position: absolute; top: 40px; width: 260px; height: 460px; background-color: #ffffff; border-radius: 4px; border: 2px solid #cbd5e1; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 10; }
+        .sleeve { position: absolute; top: 45px; width: 85px; height: 210px; background-color: #ffffff; border: 2px solid #cbd5e1; z-index: 5; }
+        .sleeve-left { left: 20px; transform: rotate(10deg); border-radius: 20px 0 0 10px; }
+        .sleeve-right { right: 20px; transform: rotate(-10deg); border-radius: 0 20px 10px 0; }
+        .collar-left, .collar-right { position: absolute; top: 0; width: 0; height: 0; border-style: solid; z-index: 25; }
+        .collar-left { left: 55px; border-width: 50px 75px 0 0; border-color: #f1f5f9 transparent transparent transparent; }
+        .collar-right { right: 55px; border-width: 50px 0 0 75px; border-color: #f1f5f9 transparent transparent transparent; }
+        .brass { position: absolute; width: 16px; height: 16px; background: #ffd700; border-radius: 50%; border: 1px solid #996515; top: 18px; z-index: 30; }
+        .brass-left { left: 20px; } .brass-right { right: 20px; }
+        .pocket { position: absolute; width: 90px; height: 100px; background-color: #ffffff; border: 1px solid #e2e8f0; z-index: 12; }
+        .pocket-flap { position: absolute; top: -5px; width: 100%; height: 26px; background-color: #ffffff; border: 1px solid #e2e8f0; clip-path: polygon(0 0, 100% 0, 100% 70%, 50% 100%, 0 70%); z-index: 13; }
+        .pocket-left { top: 150px; right: 30px; } .pocket-right { top: 150px; left: 30px; }
+        
+        /* --- COMPONENTS --- */
+        .ribbon-rack-container { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 8px; display: flex; flex-direction: column-reverse; gap: 1.5px; align-items: center; }
+        .ribbon-mini { width: 26px; height: 8px; background-size: cover; border: 0.1px solid #000; position: relative; animation: pop 0.2s ease-out; }
+        .mini-star { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 6px; color: #ffd700; text-shadow: 0.5px 0.5px black; }
+        
+        .medal-rack-container { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 1.5px; z-index: 14; }
+        .medal-mini { width: 14px; height: 20px; display: flex; flex-direction: column; align-items: center; animation: pop 0.2s ease-out; }
+        .medal-ribbon-part { width: 12px; height: 10px; border: 0.1px solid #000; }
+        .medal-coin-part { width: 10px; height: 10px; background: #ffd700; border-radius: 50%; border: 0.2px solid #996515; margin-top: -1px; }
+
+        .arc-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; flex-wrap: wrap; justify-content: center; align-content: center; align-items: center; height: 72px; width: 90px; gap: 2px 8px; }
+        .arc-mini { width: 38px; height: 12px; background-size: contain; background-repeat: no-repeat; background-position: center; flex-shrink: 0; animation: pop 0.2s ease-out; }
+
+        .tab-locked { opacity: 0.4; cursor: not-allowed !important; }
+
+        #selection-list::-webkit-scrollbar { width: 6px; }
+        #selection-list::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <div id="landing-page" class="fixed inset-0 z-50 bg-[#0f172a] flex flex-col items-center justify-center p-6 text-white overflow-y-auto">
+        <div class="max-w-4xl w-full text-center space-y-12 relative z-10 py-12">
+            <div class="space-y-4 animate-in" style="animation-delay: 0.2s;">
+                <h1 class="text-5xl md:text-7xl font-black tracking-tighter leading-none">Broward County<br><span class="text-indigo-500 italic">MyUniform</span></h1>
+                <p class="text-slate-400 text-sm font-medium uppercase tracking-[0.3em]">Cadet Assistance Tool</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto animate-in" style="animation-delay: 0.4s;">
+                <div onclick="enterApp('Pompano Beach HS', 'Tornado Battalion')" class="school-card p-7 bg-white/5 rounded-[2.5rem]">
+                    <h3 class="font-bold text-2xl">Pompano Beach</h3>
+                    <p class="text-indigo-400 text-[11px] font-black uppercase tracking-widest">Tornado Battalion</p>
+                </div>
+                <div class="school-card p-7 bg-white/5 rounded-[2.5rem] coming-soon">
+                    <h3 class="font-bold text-2xl">Other Schools</h3>
+                    <p class="text-slate-400 text-[11px] font-black uppercase tracking-widest italic">Coming Soon</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="builder-content" class="hidden min-h-screen">
+        <header class="p-6 flex items-center justify-between sticky top-0 bg-slate-50/80 backdrop-blur-xl z-40 border-b">
+            <button onclick="exitApp()" class="bg-white p-2.5 rounded-xl border border-slate-200">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <div class="text-center">
+                <h2 id="header-school-name" class="text-xl font-black text-slate-900">School</h2>
+                <p id="header-unit-name" class="text-[10px] text-indigo-600 font-black uppercase">Battalion</p>
+            </div>
+            <button onclick="resetAll()" class="text-red-500 font-bold uppercase text-[10px] px-3 py-1 border border-red-100 rounded">Reset</button>
+        </header>
+
+        <div class="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 lg:grid-cols-2 gap-10">
+            <div class="flex flex-col items-center">
+                <div class="bg-[#0f172a] w-full rounded-[4rem] p-4 py-12 shadow-2xl relative flex items-center justify-center overflow-hidden">
+                    <div class="mannequin-container animate-float">
+                        <div class="sleeve sleeve-left"></div><div class="sleeve sleeve-right"></div>
+                        <div class="shirt-body">
+                            <div class="collar-left"><div class="brass brass-left"></div></div>
+                            <div class="collar-right"><div class="brass brass-right"></div></div>
+                            <div class="pocket pocket-left">
+                                <div class="pocket-flap"></div>
+                                <div id="u-ribbons" class="ribbon-rack-container"></div>
+                                <div id="u-medals" class="medal-rack-container"></div>
+                            </div>
+                            <div class="pocket pocket-right">
+                                <div class="pocket-flap"></div>
+                                <div id="u-arcs" class="arc-container"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-[3rem] p-8 shadow-xl border">
+                <div class="flex p-1.5 bg-slate-100 rounded-[1.8rem] mb-8">
+                    <button onclick="setTab('ribbons')" id="btn-ribbons" class="flex-1 py-3.5 rounded-[1.5rem] font-bold text-sm bg-white text-indigo-600 shadow-sm">Ribbons</button>
+                    <button id="btn-medals" class="flex-1 py-3.5 rounded-[1.5rem] font-bold text-sm text-slate-400 tab-locked">Medals</button>
+                    <button id="btn-arcs" class="flex-1 py-3.5 rounded-[1.5rem] font-bold text-sm text-slate-400 tab-locked">Arcs</button>
+                </div>
+                <div id="selection-list" class="space-y-3 max-h-[500px] overflow-y-auto pr-2"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const RIBBONS = [
+            { id: 'hero', name: 'Medal for Heroism', precedence: 1, img: 'https://i.imgur.com/lRpMVss.png' },
+            { id: 'sup-c', name: 'Superior Cadet Award', precedence: 2, img: 'https://i.imgur.com/ag9hDrg.png' },
+            { id: 'n11', name: 'N-1-1: Distinguished Cadet', precedence: 3, img: 'https://i.imgur.com/WLRaSvz.png' },
+            { id: 'n12', name: 'N-1-2: Academic Excellence', precedence: 4, img: 'https://i.imgur.com/vESK8nO.png' },
+            { id: 'n13', name: 'N-1-3: Academic Achievement', precedence: 5, img: 'https://i.imgur.com/YoJu7HR.png' },
+            { id: 'n14', name: 'N-1-4: Perfect Attendance', precedence: 6, img: 'https://i.imgur.com/pPb2TsA.png' },
+            { id: 'n15', name: 'N-1-5: Student Government', precedence: 7, img: 'https://i.imgur.com/ez0bwcL.png' },
+            { id: 'n16', name: 'N-1-6: Leadership Dev Service', precedence: 8, img: 'https://i.imgur.com/pkJIyNv.png' },
+            { id: 'n17', name: 'N-1-7: Superior Instructor', precedence: 9, img: 'https://i.imgur.com/bX4CIpN.png' },
+            { id: 'n18', name: 'N-1-8: CPR First Aid', precedence: 10, img: 'https://i.imgur.com/RCyIcLL.png' },
+            { id: 'n19', name: 'N-1-9: Distinguished (N-1-9)', precedence: 11, img: 'https://i.imgur.com/NvHhF9w.png' },
+            { id: 'n110', name: 'N-1-10: Honor Cadet (N-1-10)', precedence: 12, img: 'https://i.imgur.com/UKoQnaP.png' },
+            { id: 'n31', name: 'N-3-1: Instructor Leadership', precedence: 13, img: 'https://i.imgur.com/rQqVytu.png' },
+            { id: 'n32', name: 'N-3-2: Personal Appearance', precedence: 14, img: 'https://i.imgur.com/aplKUwn.png' },
+            { id: 'n33', name: 'N-3-3: Proficiency', precedence: 15, img: 'https://i.imgur.com/U31PkpC.png' },
+            { id: 'n34', name: 'N-3-4: Drill Team', precedence: 16, img: 'https://i.imgur.com/nqiHeWN.png' },
+            { id: 'n35', name: 'N-3-5: Orienteering', precedence: 17, img: 'https://i.imgur.com/xSfZfHy.png' },
+            { id: 'n36', name: 'N-3-6: Color Guard', precedence: 18, img: 'https://i.imgur.com/txzPfiW.png' },
+            { id: 'n37', name: 'N-3-7: Marksmanship', precedence: 19, img: 'https://i.imgur.com/u1JQmOb.png' },
+            { id: 'n38', name: 'N-3-8: Adventure Training', precedence: 20, img: 'https://i.imgur.com/NHW3HLz.png' },
+            { id: 'n39', name: 'N-3-9: Commendation', precedence: 21, img: 'https://i.imgur.com/H4gqvH2.png' },
+            { id: 'n310', name: 'N-3-10: Good Conduct', precedence: 22, img: 'https://i.imgur.com/H4gqvH2.png' },
+            { id: 'n311', name: 'N-3-11: JCLC Participation', precedence: 23, img: 'https://i.imgur.com/LqsYvL8.png' },
+            { id: 'n312', name: 'N-3-12: Championship Drill', precedence: 24, img: 'https://i.imgur.com/JI0f8Jq.png' },
+            { id: 'n313', name: 'N-3-13: Raider Team', precedence: 25, img: 'https://i.imgur.com/H5ONRJD.png' },
+            { id: 'n314', name: 'N-3-14: Recondo / Rappel', precedence: 26, img: 'https://i.imgur.com/NHW3HLz.png' },
+            { id: 'n315', name: 'N-3-15: Meritorious Action', precedence: 27, img: 'https://i.imgur.com/jlnRqmo.png' },
+            { id: 'n21', name: 'N-2-1: Varsity Athletics', precedence: 28, img: 'https://i.imgur.com/VidvtD2.png' },
+            { id: 'n22', name: 'N-2-2: Physical Fitness', precedence: 29, img: 'https://i.imgur.com/6evj1g2.png' },
+            { id: 'n23', name: 'N-2-3: JROTC Athletics', precedence: 30, img: 'https://i.imgur.com/Yae98hZ.png' },
+            { id: 'n24', name: 'N-2-4: JV Athletics', precedence: 31, img: 'https://i.imgur.com/6evj1g2.png' },
+            { id: 'n25', name: 'N-2-5: Athletic Service', precedence: 32, img: 'https://i.imgur.com/JHvrxUm.png' },
+            { id: 'n41', name: 'N-4-1: Parade', precedence: 33, img: 'https://i.imgur.com/q0uXknP.png' },
+            { id: 'n42', name: 'N-4-2: Recruiting', precedence: 34, img: 'https://i.imgur.com/6cPsTQ6.png' },
+            { id: 'n43', name: 'N-4-3: School Support', precedence: 35, img: 'https://i.imgur.com/oxVk5i4.png' },
+            { id: 'n44', name: 'N-4-4: Community Service', precedence: 36, img: 'https://i.imgur.com/ZRCFd8P.png' },
+            { id: 'n45', name: 'N-4-5: Confidence Course', precedence: 37, img: 'https://i.imgur.com/oxVk5i4.png' },
+            { id: 'n46', name: 'N-4-6: Service Learning', precedence: 38, img: 'https://i.imgur.com/AG3j5wN.png' },
+            { id: 'n47', name: 'N-4-7: Excellent Staff', precedence: 39, img: 'https://i.imgur.com/dCCATHX.png' }
+        ];
+
+        const MEDALS = [
+            { id: 'm1', name: 'JPA Medal', color: '#8b0000' },
+            { id: 'm2', name: '100 Flag Medal', color: '#ffd700' },
+            { id: 'm3', name: 'Most Flags Medal', color: '#00008b' },
+            { id: 'm4', name: 'Superior Cadet', color: '#006400' }
+        ];
+
+        const ARCS = [
+            { id: 'a-challenge', name: 'Cadet Challenge', img: 'https://i.imgur.com/2Vr16pL.png' },
+            { id: 'a-jclc', name: 'JCLC', img: 'https://i.imgur.com/GrtMwUl.png' },
+            { id: 'a-color', name: 'Color Guard', img: 'https://i.imgur.com/dSTNyGC.png' },
+            { id: 'a-leadership', name: 'Leadership', img: 'https://i.imgur.com/zCe1FJD.png' },
+            { id: 'a-drill', name: 'Drill Team', img: 'https://i.imgur.com/zCe1FJD.png' },
+            { id: 'a-mentor', name: 'Mentor', img: 'https://i.imgur.com/zyu3nqY.png' },
+            { id: 'a-exhibition', name: 'Exhibition', img: 'https://i.imgur.com/DBdRxW5.png' },
+            { id: 'a-raider', name: 'Raider', img: 'https://i.imgur.com/3WBCCOV.png' },
+            { id: 'a-flag', name: 'Flag Detail', img: 'https://i.imgur.com/prqmruo.png' },
+            { id: 'a-saber', name: 'Saber Team', img: 'https://i.imgur.com/k4csU5W.png' },
+            { id: 'a-honor', name: 'Honor Guard', img: 'https://i.imgur.com/NetAs8Y.png' },
+            { id: 'a-staff', name: 'Staff', img: 'https://i.imgur.com/ASA0zcD.png' }
+        ].sort((a, b) => a.name.localeCompare(b.name));
+
+        let state = { ribbons: new Map(), medals: new Set(), arcs: new Set(), tab: 'ribbons' };
+
+        function enterApp(s, u) { 
+            document.getElementById('header-school-name').innerText = s; 
+            document.getElementById('header-unit-name').innerText = u;
+            document.getElementById('landing-page').classList.add('hidden'); 
+            document.getElementById('builder-content').classList.remove('hidden'); 
+            renderSelections(); 
+        }
+        function exitApp() { document.getElementById('builder-content').classList.add('hidden'); document.getElementById('landing-page').classList.remove('hidden'); }
+        function setTab(t) { state.tab = t; renderSelections(); }
+        function toggleItem(type, id) { if (state[type].has(id)) state[type].delete(id); else state[type].add(id); renderSelections(); updatePreview(); }
+        function updateRibbon(id, d) { let c = (state.ribbons.get(id) || 0) + d; if (c <= 0) state.ribbons.delete(id); else state.ribbons.set(id, Math.min(c, 10)); renderSelections(); updatePreview(); }
+
+        function renderSelections() {
+            const list = document.getElementById('selection-list'); list.innerHTML = '';
+            // For now, only Ribbons are rendered in the selection list
+            RIBBONS.forEach(r => {
+                const count = state.ribbons.get(r.id) || 0;
+                const div = document.createElement('div');
+                div.className = `flex items-center justify-between p-4 rounded-3xl border transition-all ${count > 0 ? 'border-indigo-500 bg-indigo-50/40' : 'border-slate-100 bg-white'}`;
+                div.innerHTML = `<div class="flex items-center gap-4"><img src="${r.img}" class="w-14 h-4 object-fill rounded shadow-sm"><span class="text-xs font-bold text-slate-700">${r.name}</span></div><div class="flex items-center bg-white rounded-2xl p-1 shadow-sm border"><button onclick="updateRibbon('${r.id}', -1)" class="w-8 h-8 text-slate-400 font-black">-</button><span class="w-8 text-center text-xs font-black text-indigo-600">${count}</span><button onclick="updateRibbon('${r.id}', 1)" class="w-8 h-8 text-indigo-500 font-black">+</button></div>`;
+                list.appendChild(div);
+            });
+        }
+
+function updatePreview() {
+    const activeRibbons = RIBBONS
+        .filter(r => state.ribbons.has(r.id))
+        .sort((a, b) => a.precedence - b.precedence);
+
+    const rPreview = document.getElementById('u-ribbons'); 
+    rPreview.innerHTML = '';
+    
+    if (activeRibbons.length === 0) return;
+
+    const rows = [];
+    let tempRibbons = [...activeRibbons];
+
+    // Determine how many ribbons go in the top row (the "remainder")
+    const topRowSize = tempRibbons.length % 3 || 3; 
+    
+    // Extract the top row first
+    rows.push(tempRibbons.splice(0, topRowSize));
+
+    // Everything else fits into rows of 3
+    while (tempRibbons.length > 0) {
+        rows.push(tempRibbons.splice(0, 3));
+    }
+
+    /* Because CSS uses flex-direction: column-reverse, 
+       we reverse the array so the top row is added LAST to the DOM.
+    */
+    const displayRows = rows.reverse();
+
+    displayRows.forEach(rowItems => {
+        const rowDiv = document.createElement('div'); 
+        rowDiv.className = 'flex gap-[1px] justify-center'; // Center the top row
+        
+        rowItems.forEach(r => {
+            const count = state.ribbons.get(r.id);
+            const div = document.createElement('div'); 
+            div.className = 'ribbon-mini'; 
+            div.style.backgroundImage = `url(${r.img})`;
+            
+            if (count > 1) {
+                const star = document.createElement('div'); 
+                star.className = 'mini-star';
+                star.innerText = count > 5 ? '★S' : '★'.repeat(count - 1);
+                div.appendChild(star);
+            }
+            rowDiv.appendChild(div);
+        });
+        rPreview.appendChild(rowDiv);
+    });
+
+    document.getElementById('u-medals').innerHTML = '';
+    document.getElementById('u-arcs').innerHTML = '';
+}
+
+        function resetAll() { state.ribbons.clear(); updatePreview(); renderSelections(); }
+        window.onload = renderSelections;
+    </script>
+</body>
+</html>
