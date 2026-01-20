@@ -9,19 +9,44 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; overflow-x: hidden; }
 
-        /* Scaled to match the 3.5:1 ratio of 105x30px assets */
+        .mannequin-container { 
+            position: relative; 
+            width: 480px; 
+            height: 620px; 
+            display: flex; 
+            justify-content: center; 
+        }
+
+        .mannequin-img {
+            height: 100%;
+            width: auto;
+            object-fit: contain;
+            z-index: 10;
+        }
+
+        /* Ribbon Rack Positioning for Male Class A */
+        .ribbon-rack-container { 
+            position: absolute; 
+            top: 228px; /* Adjusted for Male Class A pocket alignment */
+            left: 63%;  /* Center of the left-side pocket area */
+            transform: translateX(-50%); 
+            display: flex; 
+            flex-direction: column-reverse; 
+            gap: 1.5px; 
+            align-items: center; 
+            z-index: 20;
+        }
+
         .ribbon-mini {
             width: 35px; 
             height: 10px;
             background-size: 100% 100%;
             background-repeat: no-repeat;
             background-position: center;
-            border: 0.5px solid rgba(0,0,0,0.8);
+            border: 0.4px solid rgba(0,0,0,0.9);
             position: relative;
-            animation: pop 0.2s ease-out;
+            box-shadow: 0 0.5px 1px rgba(0,0,0,0.3);
         }
-
-        @keyframes pop { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
         .mini-star {
             position: absolute;
@@ -30,25 +55,22 @@
             transform: translate(-50%, -50%);
             font-size: 7px;
             color: #ffd700;
-            text-shadow: 0.5px 0.5px black;
+            text-shadow: 0.5px 0.5px 1px black;
             width: 100%;
             text-align: center;
             pointer-events: none;
             letter-spacing: -1px;
         }
 
-        .mannequin-container { position: relative; width: 440px; height: 540px; display: flex; justify-content: center; }
-        .shirt-body { position: absolute; top: 40px; width: 260px; height: 460px; background-color: #ffffff; border-radius: 4px; border: 2px solid #cbd5e1; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 10; }
-        .pocket { position: absolute; width: 90px; height: 100px; background-color: #ffffff; border: 1px solid #e2e8f0; z-index: 12; }
-        .pocket-left { top: 150px; right: 30px; } 
-        .ribbon-rack-container { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 8px; display: flex; flex-direction: column-reverse; gap: 1.5px; align-items: center; }
+        @keyframes pop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .ribbon-mini { animation: pop 0.15s ease-out; }
     </style>
 </head>
 <body>
 
     <div id="landing-page" class="fixed inset-0 z-50 bg-[#0f172a] flex flex-col items-center justify-center p-6 text-white">
         <h1 class="text-5xl font-black text-center mb-12">Broward County<br><span class="text-indigo-500 italic">MyUniform</span></h1>
-        <div onclick="enterApp('Pompano Beach HS', 'Tornado Battalion')" class="p-8 bg-white/5 rounded-[2.5rem] border border-indigo-500/30 hover:bg-white/10 cursor-pointer transition-all w-full max-w-sm text-center">
+        <div onclick="enterApp()" class="p-8 bg-white/5 rounded-[2.5rem] border border-indigo-500/30 hover:bg-white/10 cursor-pointer transition-all w-full max-w-sm text-center">
             <h3 class="font-bold text-2xl">Pompano Beach</h3>
             <p class="text-indigo-400 text-[11px] font-black uppercase tracking-widest mt-2">Tornado Battalion</p>
         </div>
@@ -56,32 +78,29 @@
 
     <div id="builder-content" class="hidden min-h-screen">
         <header class="p-6 flex items-center justify-between sticky top-0 bg-slate-50/80 backdrop-blur-xl z-40 border-b">
-            <button onclick="exitApp()" class="bg-white p-2.5 rounded-xl border border-slate-200 font-bold text-xs uppercase">Exit</button>
+            <button onclick="exitApp()" class="bg-white px-4 py-2 rounded-xl border border-slate-200 font-bold text-xs uppercase">Exit</button>
             <div class="text-center">
                 <h2 class="text-xl font-black">Pompano Beach HS</h2>
                 <p class="text-indigo-600 font-black text-[10px] uppercase tracking-widest">Tornado Battalion</p>
             </div>
-            <button onclick="resetAll()" class="text-red-500 font-bold text-xs">RESET</button>
+            <button onclick="resetAll()" class="text-red-500 font-bold text-xs uppercase tracking-wider">Reset</button>
         </header>
 
-        <div class="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 lg:grid-cols-2 gap-10">
+        <div class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-2 gap-10">
             <div class="flex flex-col items-center">
-                <div class="bg-[#0f172a] w-full rounded-[4rem] p-4 py-12 shadow-2xl flex items-center justify-center">
+                <div class="bg-slate-900 w-full rounded-[4rem] p-4 shadow-2xl flex items-center justify-center overflow-hidden border-4 border-slate-800">
                     <div class="mannequin-container">
-                        <div class="shirt-body">
-                            <div class="pocket pocket-left">
-                                <div id="u-ribbons" class="ribbon-rack-container"></div>
-                            </div>
-                        </div>
+                        <img src="assets/Male_Class_A.png" class="mannequin-img" alt="Male Class A Uniform">
+                        <div id="u-ribbons" class="ribbon-rack-container"></div>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-[3rem] p-8 shadow-xl border h-[700px] flex flex-col">
+            <div class="bg-white rounded-[3rem] p-8 shadow-xl border h-[720px] flex flex-col">
                 <div class="flex p-1.5 bg-slate-100 rounded-[1.8rem] mb-6">
                     <button class="flex-1 py-3 rounded-[1.5rem] font-bold text-sm bg-white text-indigo-600 shadow-sm">Ribbons</button>
-                    <button class="flex-1 py-3 rounded-[1.5rem] font-bold text-sm text-slate-300 cursor-not-allowed">Medals (Soon)</button>
-                    <button class="flex-1 py-3 rounded-[1.5rem] font-bold text-sm text-slate-300 cursor-not-allowed">Arcs (Soon)</button>
+                    <button class="flex-1 py-3 rounded-[1.5rem] font-bold text-sm text-slate-300 cursor-not-allowed">Medals</button>
+                    <button class="flex-1 py-3 rounded-[1.5rem] font-bold text-sm text-slate-300 cursor-not-allowed">Arcs</button>
                 </div>
                 
                 <input type="text" id="ribbonSearch" onkeyup="renderSelections()" placeholder="Search ribbons..." class="w-full p-4 mb-4 rounded-2xl border border-slate-200 bg-slate-50 text-sm outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
@@ -92,6 +111,7 @@
     </div>
 
     <script>
+        // Official Ribbons Array (Precedence Ordered)
         const OFFICIAL_RIBBONS = [
             { id: 'hero', name: 'Medal for Heroism', precedence: 1, img: 'assets/army_jrotc_medal_for_heroism_ribbon.png' },
             { id: 'sup-c', name: 'Superior Cadet Award', precedence: 2, img: 'assets/army_jrotc_superior_cadet_ribbon.png' },
@@ -161,9 +181,9 @@
         function exitApp() { location.reload(); }
 
         function updateRibbon(id, d) {
-            let c = (state.ribbons.get(id) || 0) + d;
-            if (c <= 0) state.ribbons.delete(id); 
-            else state.ribbons.set(id, Math.min(c, 5)); // 1 + 4 stars max
+            let count = (state.ribbons.get(id) || 0) + d;
+            if (count <= 0) state.ribbons.delete(id); 
+            else state.ribbons.set(id, Math.min(count, 5));
             updatePreview(); renderSelections();
         }
 
