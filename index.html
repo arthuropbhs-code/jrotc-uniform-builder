@@ -40,7 +40,18 @@
         height: 9px;
     }
 }
-
+/* --- FIXED RIBBON ALIGNMENT --- */
+        .ribbon-rack-container { 
+            position: absolute; 
+            bottom: 100%;           /* Anchors the bottom of the rack to the top of the pocket */
+            left: 50%; 
+            transform: translateX(-50%); 
+            margin-bottom: 2px;     /* Small gap above the pocket seam */
+            display: flex; 
+            flex-direction: column-reverse; /* Stacks new rows UPWARD */
+            gap: 1px; 
+            align-items: center; 
+        }
         .mannequin-container { 
             position: relative; 
             width: 480px; 
@@ -246,39 +257,52 @@
             });
         }
 
-        function updatePreview() {
-            const container = document.getElementById('u-ribbons');
-            container.innerHTML = '';
+function updatePreview() {
+            const rContainer = document.getElementById('u-ribbons');
+            rContainer.innerHTML = '';
             
-            const active = [...OFFICIAL_RIBBONS, ...POMPANO_RIBBONS]
-                .filter(r => state.ribbons.has(r.id))
-                .sort((a,b) => a.precedence - b.precedence);
-
-            if(active.length === 0) return;
-
-            let temp = [...active];
-            const rows = [];
-            const topRowSize = temp.length % 3 || 3;
-            rows.push(temp.splice(0, topRowSize));
-            while(temp.length > 0) rows.push(temp.splice(0,3));
-
-            rows.reverse().forEach(row => {
-                const rowDiv = document.createElement('div');
-                rowDiv.className = "flex gap-[1.5px]";
-                row.forEach(r => {
-                    const d = document.createElement('div');
-                    d.className = 'ribbon-mini';
-                    d.style.backgroundImage = `url(${r.img})`;
-                    const c = state.ribbons.get(r.id);
-                    if(c > 1) {
-                        const s = document.createElement('div');
-                        s.className = 'mini-star';
-                        s.innerText = '★'.repeat(c-1);
-                        d.appendChild(s);
+            // Filter and sort ribbons
+            const activeRibbons = RIBBONS.filter(r => state.ribbons.has(r.id)).sort((a,b) => a.precedence - b.precedence);
+            
+            // This loop creates rows of 3
+            for(let i=0; i<activeRibbons.length; i+=3) {
+                const row = document.createElement('div');
+                row.className = 'flex gap-px';
+                activeRibbons.slice(i, i+3).forEach(r => {
+                    const count = state.ribbons.get(r.id);
+                    const div = document.createElement('div');
+                    div.className = 'ribbon-mini';
+                    div.style.backgroundImage = `url(${r.img})`;
+                    if (count > 1) {
+                        const star = document.createElement('div'); 
+                        star.className = 'mini-star';
+                        star.innerText = '★'.repeat(count - 1);
+                        div.appendChild(star);
                     }
-                    rowDiv.appendChild(d);
+                    row.appendChild(div);
                 });
-                container.appendChild(rowDiv);
+                // Append the row to the container
+                rContainer.appendChild(row);
+            }
+
+            // Update Medals (stays the same)
+            const mContainer = document.getElementById('u-medals');
+            mContainer.innerHTML = '';
+            MEDALS.filter(m => state.medals.has(m.id)).forEach(m => {
+                const div = document.createElement('div');
+                div.className = 'medal-mini';
+                div.innerHTML = `<div class="medal-ribbon-part ${m.class}" style="background:${m.color}"></div><div class="medal-coin-part"></div>`;
+                mContainer.appendChild(div);
+            });
+
+            // Update Arcs (stays the same)
+            const aContainer = document.getElementById('u-arcs');
+            aContainer.innerHTML = '';
+            ARCS.filter(a => state.arcs.has(a.id)).forEach(a => {
+                const div = document.createElement('div');
+                div.className = 'arc-mini';
+                div.innerText = a.name;
+                aContainer.appendChild(div);
             });
         }
 
