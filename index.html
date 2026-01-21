@@ -10,21 +10,33 @@
         body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; overflow-x: hidden; }
 
         /* This only triggers on screens smaller than 768px (Mobile/Tablets) */
+/* 1. TABLET VIEW (768px and down) - Keep your current settings here */
 @media (max-width: 768px) {
     .mannequin-container {
-        width: 320px; /* Smaller container for mobile */
-        height: 450px;
+        width: 380px; 
+        height: 520px;
     }
-
     .ribbon-rack-container {
-        /* Adjust these numbers specifically for the mobile view */
-        top: 145px; 
+        top: 175px; /* Adjust this if tablet still feels slightly off */
         left: 63%;
-        transform: translateX(-50%) scale(0.8); /* Scales ribbons down slightly for smaller screens */
+        transform: translateX(-50%) scale(0.9);
     }
+}
 
+/* 2. PHONE VIEW (480px and down) - Specifically for small screens */
+@media (max-width: 480px) {
+    .mannequin-container {
+        width: 320px; 
+        height: 440px;
+    }
+    .ribbon-rack-container {
+        /* If they are too high, INCREASE this number */
+        top: 155px; 
+        left: 63.5%;
+        transform: translateX(-50%) scale(0.8);
+    }
     .ribbon-mini {
-        width: 30px; /* Slightly smaller ribbons so they don't look huge on a small phone */
+        width: 30px;
         height: 9px;
     }
 }
