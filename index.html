@@ -446,13 +446,15 @@ function updatePreview() {
     const container = document.getElementById('u-ribbons');
     const mContainer = document.getElementById('u-medals');
     const aContainer = document.getElementById('u-arcs');
-
+    
     if (!container) return;
 
+    // 1. Sort by precedence (Highest rank = lowest precedence number)
     const sortedActive = [...OFFICIAL_RIBBONS, ...POMPANO_RIBBONS]
         .filter(r => state.ribbons.has(r.id))
         .sort((a, b) => a.precedence - b.precedence);
 
+    // If empty, show placeholder and clear others
     if (sortedActive.length === 0) {
         container.innerHTML = '<div class="text-slate-600 text-xs italic">No ribbons added</div>';
         if (mContainer) mContainer.innerHTML = '';
@@ -460,28 +462,41 @@ function updatePreview() {
         return;
     }
 
-    // Build rows bottom-up
-    const rows = [];
-    let index = sortedActive.length;
+    // 2. Logic to ensure the BOTTOM row is always full (3 ribbons)
+    // We calculate how many ribbons belong in the top row (the remainder)
+    const total = sortedActive.length;
+    const remainder = total % 3;
+    const topRowCount = remainder === 0 ? 3 : remainder;
 
-    while (index > 0) {
-        const start = Math.max(index - 3, 0);
-        rows.push(sortedActive.slice(start, index));
-        index = start;
+    // 3. Group into rows
+    const rows = [];
+    
+    // Create the top row first (contains the highest priority ribbons)
+    const topRowItems = sortedActive.slice(0, topRowCount);
+    rows.push(topRowItems);
+
+    // Create all subsequent rows (these will always be full sets of 3)
+    for (let i = topRowCount; i < total; i += 3) {
+        rows.push(sortedActive.slice(i, i + 3));
     }
 
+    // 4. Render to DOM
     container.innerHTML = '';
 
-    // Render bottom row first so rack grows upward
+    // We simply append rows. Since we want them to stack, and the container 
+    // should naturally flow, we just append them. 
+    // If your CSS uses flex-col-reverse, you would reverse this list.
+    // Based on standard layouts, we'll append them in order.
     rows.forEach(rowItems => {
         const rowDiv = document.createElement('div');
+        // justify-center keeps ribbons centered if the top row has < 3
         rowDiv.className = "flex gap-[1.5px] justify-center";
-
+        
         rowItems.forEach(r => {
             const d = document.createElement('div');
             d.className = 'ribbon-mini';
             d.style.backgroundImage = `url(${r.img})`;
-
+            
             const count = state.ribbons.get(r.id);
             if (count > 1) {
                 const s = document.createElement('div');
@@ -489,24 +504,22 @@ function updatePreview() {
                 s.innerText = '★'.repeat(count - 1);
                 d.appendChild(s);
             }
-
             rowDiv.appendChild(d);
         });
-
+        
         container.appendChild(rowDiv);
     });
 
-    // Medals
+    // --- Medals & Arcs logic ---
     if (mContainer) {
         mContainer.innerHTML = '';
-        MEDALS.filter(m => state.medals.has(m.id)).forEach(() => {
+        MEDALS.filter(m => state.medals.has(m.id)).forEach(m => {
             const d = document.createElement('div');
             d.className = 'medal-mini h-8 w-5 bg-yellow-600 border border-black';
             mContainer.appendChild(d);
         });
     }
 
-    // Arcs
     if (aContainer) {
         aContainer.innerHTML = '';
         ARCS.filter(a => state.arcs.has(a.id)).forEach(a => {
