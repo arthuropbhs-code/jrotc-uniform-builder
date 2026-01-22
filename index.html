@@ -462,20 +462,42 @@ function updatePreview() {
         return;
     }
 
-    // 2. REVERSE the list so we build from the bottom up
-    // This ensures the bottom row is filled with the lowest-ranking ribbons first
-    const buildingList = [...sortedActive].reverse();
+    // 2. Determine how many ribbons go in the top row vs full rows
+    // To keep the bottom row full, we identify the remainder first
+    const total = sortedActive.length;
+    const remainder = total % 3;
+    const topRowCount = remainder === 0 ? 3 : remainder;
 
     // 3. Clear and Set up the container
     container.innerHTML = '';
 
-    // 4. Group into rows of 3
-    for (let i = 0; i < buildingList.length; i += 3) {
+    // 4. Build the rows
+    // We work through the sorted list. The first group is the top row (can be 1, 2, or 3)
+    // All subsequent groups will be full rows of 3.
+    let currentIndex = 0;
+    const rows = [];
+
+    // Create the top row (Highest priority ribbons)
+    const topRowItems = sortedActive.slice(0, topRowCount);
+    rows.push(topRowItems);
+    currentIndex = topRowCount;
+
+    // Create subsequent full rows of 3 (Lower priority ribbons)
+    while (currentIndex < total) {
+        rows.push(sortedActive.slice(currentIndex, currentIndex + 3));
+        currentIndex += 3;
+    }
+
+    // 5. Render rows to the DOM
+    // Because we want the bottom row to be the "anchor", we reverse the rows array
+    // and use flex-direction: column-reverse in CSS, OR just append them.
+    // Given the requirement to grow UP from the pocket:
+    const renderList = [...rows].reverse(); 
+
+    renderList.forEach(rowItems => {
         const rowDiv = document.createElement('div');
-        // 'flex-row-reverse' paired with our reversed list puts the highest rank on the Top-Left
-        rowDiv.className = "flex flex-row-reverse gap-[1.5px] justify-center";
-        
-        const rowItems = buildingList.slice(i, i + 3);
+        // justify-center keeps them centered above the pocket
+        rowDiv.className = "flex gap-[1.5px] justify-center";
         
         rowItems.forEach(r => {
             const d = document.createElement('div');
@@ -493,9 +515,9 @@ function updatePreview() {
         });
         
         container.appendChild(rowDiv);
-    }
+    });
 
-    // --- Keep your Medals & Arcs logic below ---
+    // --- Medals & Arcs logic ---
     if (mContainer) {
         mContainer.innerHTML = '';
         MEDALS.filter(m => state.medals.has(m.id)).forEach(m => {
@@ -515,33 +537,6 @@ function updatePreview() {
         });
     }
 }
-
-        
-
-            const mContainer = document.getElementById('u-medals');
-            if(mContainer) {
-                mContainer.innerHTML = '';
-                MEDALS.filter(m => state.medals.has(m.id)).forEach(m => {
-                    const d = document.createElement('div');
-                    d.className = 'medal-mini';
-                    d.style.width = '18px'; d.style.height = '28px';
-                    d.innerHTML = `<div style="height:12px;background:${m.color}"></div><div style="width:16px;height:16px;background:gold;border-radius:50%;margin:-2px auto 0"></div>`;
-                    mContainer.appendChild(d);
-                });
-            }
-
-            const aContainer = document.getElementById('u-arcs');
-            if(aContainer) {
-                aContainer.innerHTML = '';
-                ARCS.filter(a => state.arcs.has(a.id)).forEach(a => {
-                    const d = document.createElement('div');
-                    d.className = 'arc-mini';
-                    d.style.padding = '1px 5px'; d.style.fontSize = '6px';
-                    d.style.background = '#232d4b'; d.style.color = 'gold'; d.style.border = '0.5px solid gold';
-                    d.style.borderRadius = '3px'; d.innerText = a.name;
-                    aContainer.appendChild(d);
-                });
-            }
 
         function resetAll() {
             state.ribbons.clear();
