@@ -339,25 +339,30 @@
         ];
 
         let state = { ribbons: new Map(), medals: new Set(), arcs: new Set(), tab: 'ribbons' };
+function enterApp() {
+    const landing = document.getElementById('landing-page');
+    const builder = document.getElementById('builder-content');
+    
+    if (landing && builder) {
+        // Hide landing page
+        landing.classList.add('hidden');
+        
+        // Show builder content
+        builder.classList.remove('hidden');
+        
+        // Trigger the fade-in effect
+        setTimeout(() => {
+            builder.classList.remove('opacity-0');
+            builder.classList.add('opacity-100');
+        }, 10);
 
-        function enterApp() {
-            const lp = document.getElementById('landing-page');
-            const bc = document.getElementById('builder-content');
-            
-            lp.style.opacity = '0';
-            lp.style.pointerEvents = 'none';
-            
-            setTimeout(() => {
-                lp.classList.add('hidden');
-                bc.classList.remove('hidden');
-                void bc.offsetWidth;
-                bc.classList.remove('opacity-0');
-                bc.classList.add('opacity-100');
-                renderSelections();
-                updatePreview();
-            }, 600);
-        }
-
+        // Initialize the preview
+        renderSelections();
+        updatePreview();
+    } else {
+        console.error("Could not find the page elements. check your IDs!");
+    }
+}
         function exitApp() { 
             const bc = document.getElementById('builder-content');
             bc.classList.remove('opacity-100');
@@ -535,19 +540,7 @@ function updatePreview() {
                     aContainer.appendChild(d);
                 });
             }
-        
-        function launchApp() {
-            const landing = document.getElementById('landing-page');
-            const app = document.getElementById('app-container');
-            
-            if (landing && app) {
-                landing.classList.add('hidden');
-                app.classList.remove('hidden');
-                window.scrollTo(0, 0);
-            } else {
-                console.error("Navigation elements not found. Check your HTML IDs.");
-            }
-        }
+
         function resetAll() {
             state.ribbons.clear();
             state.medals.clear();
