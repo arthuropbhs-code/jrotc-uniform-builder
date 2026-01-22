@@ -438,53 +438,42 @@
         }
 
         function updatePreview() {
-            const rContainer = document.getElementById('u-ribbons');
-            rContainer.innerHTML = '';
-
-            // Filter and sort by precedence
-            const activeR = OFFICIAL_RIBBONS
+            const container = document.getElementById('u-ribbons');
+            container.innerHTML = '';
+            
+            // Get active ribbons sorted by precedence
+            const active = [...OFFICIAL_RIBBONS, ...POMPANO_RIBBONS]
                 .filter(r => state.ribbons.has(r.id))
                 .sort((a,b) => a.precedence - b.precedence);
 
-            if (activeR.length === 0) return;
+            if(active.length === 0) return;
 
-                const total = activeR.length;
-                const remainder = total % 3;
-                // Determine how many ribbons go in the very top row (1, 2, or 3)
-                const topRowSize = remainder === 0 ? 3 : remainder; 
-    
-                const rows = [];
-    
-                // Step 1: Slice the top row (the one that might have 1 or 2 ribbons)
-                rows.push(activeR.slice(0, topRowSize));
-    
-                // Step 2: Slice all remaining ribbons into full rows of 3
-                for (let i = topRowSize; i < total; i += 3) {
-                rows.push(activeR.slice(i, i + 3));
+            // Loop through active ribbons 3 at a time
+            for(let i=0; i < active.length; i += 3) {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = "flex gap-[1.5px]";
+                
+                // Get up to 3 ribbons for this row
+                active.slice(i, i+3).forEach(r => {
+                    const d = document.createElement('div');
+                    d.className = 'ribbon-mini';
+                    d.style.backgroundImage = `url(${r.img})`;
+                    
+                    const c = state.ribbons.get(r.id);
+                    if(c > 1) {
+                        const s = document.createElement('div');
+                        s.className = 'mini-star';
+                        s.innerText = '★'.repeat(c-1);
+                        d.appendChild(s);
+                    }
+                    rowDiv.appendChild(d);
+                });
+                
+                // Because the container is flex-direction: column-reverse,
+                // appending row 1, then row 2, results in row 1 at the bottom.
+                container.appendChild(rowDiv);
             }
-
-            // Step 3: Render the rows
-            // Flex-direction: column-reverse handles the vertical stacking
-            rows.forEach(rowItems => {
-            const rowDiv = document.createElement('div');
-            rowDiv.className = "flex gap-[1.5px] justify-center w-full";
-        
-        rowItems.forEach(r => {
-            const d = document.createElement('div');
-            d.className = 'ribbon-mini';
-            d.style.backgroundImage = `url(${r.img})`;
-            
-            const count = state.ribbons.get(r.id);
-            if (count > 1) {
-                const s = document.createElement('div');
-                s.className = 'mini-star';
-                s.innerText = '★'.repeat(count - 1);
-                d.appendChild(s);
-            }
-            rowDiv.appendChild(d);
-        });
-        rContainer.appendChild(rowDiv);
-    });
+        }  });
 }
 
         
