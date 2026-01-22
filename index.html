@@ -75,7 +75,7 @@
   .ribbon-rack-container { 
     position: absolute; 
     /* This 'top' coordinate now acts as the ANCHOR for the bottom row */
-    top: 21%; 
+    top: 32.5%; 
     left: 69.5%;  
     /* translateY(-100%) pushes the container up so its bottom sits on the 'top' line */
     transform: translateX(-50%) translateY(-100%); 
@@ -115,14 +115,14 @@
         /* MOBILE SCALING */
         @media (max-width: 768px) {
             .mannequin-container { width: 380px; height: 520px; }
-            .ribbon-rack-container { top: 21.5%; left: 69.8%; transform: translateX(-50%) scale(0.9); }
+            .ribbon-rack-container { top: 33.8%; left: 69.8%; transform: translateX(-50%) scale(0.9); }
             .medals-container { top: 35.8%; left: 69.8%; transform: translateX(-50%) scale(0.9); }
             .arcs-container { top: 35.8%; left: 30.8%; transform: translateX(-50%) scale(0.9); }
         }
 
         @media (max-width: 480px) {
             .mannequin-container { width: 320px; height: 440px; }
-            .ribbon-rack-container { top: 22%; left: 70.2%; transform: translateX(-50%) scale(0.85); }
+            .ribbon-rack-container { top: 34%; left: 70.2%; transform: translateX(-50%) scale(0.85); }
             .medals-container { top: 36%; left: 70.2%; transform: translateX(-50%) scale(0.85); }
             .arcs-container { top: 36%; left: 30%; transform: translateX(-50%) scale(0.85); }
         }
@@ -456,16 +456,15 @@ function updatePreview() {
         .filter(r => state.ribbons.has(r.id))
         .sort((a, b) => a.precedence - b.precedence);
 
-    // If empty, show placeholder and clear others
+    // If empty, clear the containers and exit
     if (sortedActive.length === 0) {
-        container.innerHTML = '<div class="text-slate-600 text-xs italic">No ribbons added</div>';
+        container.innerHTML = ''; 
         if (mContainer) mContainer.innerHTML = '';
         if (aContainer) aContainer.innerHTML = '';
         return;
     }
 
     // 2. Logic to ensure the BOTTOM row is always full (3 ribbons)
-    // We calculate how many ribbons belong in the top row (the remainder)
     const total = sortedActive.length;
     const remainder = total % 3;
     const topRowCount = remainder === 0 ? 3 : remainder;
@@ -473,37 +472,41 @@ function updatePreview() {
     // 3. Group into rows
     const rows = [];
     
-    // Create the top row first (contains the highest priority ribbons)
+    // Create the top row first
     const topRowItems = sortedActive.slice(0, topRowCount);
     rows.push(topRowItems);
 
-    // Create all subsequent rows (these will always be full sets of 3)
+    // Create all subsequent rows
     for (let i = topRowCount; i < total; i += 3) {
         rows.push(sortedActive.slice(i, i + 3));
     }
 
-// FIND THIS SECTION IN update_preview.js AND EDIT:
+    // 4. Render to DOM
+    container.innerHTML = '';
 
-// 4. Render to DOM
-container.innerHTML = '';
-
-// .reverse() ensures the bottom row (the last ones in precedence) 
-// is the first element added to the column-reverse flexbox.
-rows.reverse().forEach(rowItems => {
-    const rowDiv = document.createElement('div');
-    rowDiv.className = "flex gap-[1.5px] justify-center";
-    
-    rowItems.forEach(r => {
-        // ... (keep the rest of your ribbon rendering logic the same)
-        const d = document.createElement('div');
-        d.className = 'ribbon-mini';
-        d.style.backgroundImage = `url(${r.img})`;
-        // ... 
-        rowDiv.appendChild(d);
+    // If your CSS uses flex-direction: column-reverse to anchor the bottom,
+    // we reverse the rows array so the "bottom" row is the first child.
+    [...rows].reverse().forEach(rowItems => {
+        const rowDiv = document.createElement('div');
+        rowDiv.className = "flex gap-[1.5px] justify-center";
+        
+        rowItems.forEach(r => {
+            const d = document.createElement('div');
+            d.className = 'ribbon-mini';
+            d.style.backgroundImage = `url(${r.img})`;
+            
+            const count = state.ribbons.get(r.id);
+            if (count > 1) {
+                const s = document.createElement('div');
+                s.className = 'mini-star';
+                s.innerText = '★'.repeat(count - 1);
+                d.appendChild(s);
+            }
+            rowDiv.appendChild(d);
+        });
+        
+        container.appendChild(rowDiv);
     });
-    
-    container.appendChild(rowDiv);
-});
 
     // --- Medals & Arcs logic ---
     if (mContainer) {
