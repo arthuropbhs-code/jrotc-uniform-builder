@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; overflow-x: hidden; }
+
+/* --- ANIMATIONS --- */
+@keyframes subtle-float { 0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);} }
+@keyframes fade-in-up { from{opacity:0; transform:translateY(20px);} to{opacity:1; transform:translateY(0);} }
+.animate-float{animation:subtle-float 4s ease-in-out infinite;}
+.animate-in{animation:fade-in-up 0.6s cubic-bezier(0.16,1,0.3,1) forwards;}
+
+/* SCHOOL CARD */
+.school-card{transition:all 0.4s;cursor:pointer;border:1px solid rgba(255,255,255,0.1);}
+.school-card:hover{transform:translateY(-10px) scale(1.03);background-color:rgba(255,255,255,0.15);border-color:#6366f1;box-shadow:0 25px 50px -12px rgba(99,102,241,0.3);}
+
+/* MANNEQUIN */
+.mannequin-container{position:relative;width:380px;height:480px;display:flex;justify-content:center;}
+.shirt-body{position:absolute;top:40px;width:220px;height:400px;background-color:#d2b48c;border-radius:4px;border:2px solid #a78b5b;box-shadow:0 10px 25px rgba(0,0,0,0.1);z-index:10;}
+.sleeve{position:absolute;top:45px;width:70px;height:180px;background-color:#d2b48c;border:2px solid #a78b5b;z-index:5;}
+.pocket-flap{top:-5px;width:100%;height:22px;background-color:#d2b48c;border:1px solid #a78b5b;clip-path:polygon(0 0,100% 0,100% 70%,50% 100%,0 70%);}
+.brass{background:#333;border:1px solid #222;}
+.epaulette{position:absolute;width:60px;height:12px;background-color:#4b5320;top:20px;left:20px;border-radius:2px;z-index:20;}
+.epaulette-right{left:auto;right:20px;}
+.epaulette-rank{position:absolute;width:6px;height:6px;background-color:#ffd700;border-radius:50%;top:3px;left:3px;}
+
+/* PREVIEW ITEMS */
+.ribbon-mini{width:20px;height:12px;background-size:cover;background-position:center;margin:1px;position:relative;}
+.mini-star{position:absolute;bottom:-4px;right:-4px;font-size:8px;color:#ffd700;font-weight:bold;}
+.medal-mini{width:22px;height:22px;margin:2px;display:inline-block;position:relative;}
+.medal-ribbon-part{width:100%;height:8px;}
+.medal-coin-part{width:100%;height:14px;background:#ccc;border-radius:50%;}
+.arc-mini{padding:2px 4px;margin:1px;background:#e0e7ff;border-radius:4px;font-size:9px;text-align:center;display:inline-block;}
