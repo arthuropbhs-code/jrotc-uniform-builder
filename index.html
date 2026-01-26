@@ -113,11 +113,24 @@
         }
 
         /* MOBILE SCALING */
-        @media (max-width: 768px) {
-            .mannequin-container { width: 380px; height: 520px; }
-            .ribbon-rack-container { top: 27.5%; left: 69.8%; transform: translateX(-50%) scale(0.9); }
-            .medals-container { top: 35.8%; left: 69.8%; transform: translateX(-50%) scale(0.9); }
-            .arcs-container { top: 35.8%; left: 30.8%; transform: translateX(-50%) scale(0.9); }
+       @media (max-width: 768px) {
+    .mannequin-container { width: 380px; height: 520px; }
+    .ribbon-rack-container { 
+        top: 27.5% !important; 
+        left: 69.8% !important; 
+        transform: translateX(-50%) scale(0.9); 
+    }
+    .medals-container { 
+        top: 35.8% !important; 
+        left: 69.8% !important; 
+        transform: translateX(-50%) scale(0.9); 
+    }
+    .arcs-container { 
+        top: 35.8% !important; 
+        left: 30.8% !important; 
+        transform: translateX(-50%) scale(0.9); 
+    }
+}
         }
 
         @media (max-width: 480px) {
@@ -125,6 +138,7 @@
             .ribbon-rack-container { top: 27%; left: 70.2%; transform: translateX(-50%) scale(0.85); }
             .medals-container { top: 36%; left: 70.2%; transform: translateX(-50%) scale(0.85); }
             .arcs-container { top: 36%; left: 30%; transform: translateX(-50%) scale(0.85); }
+            
         }
 
         /* RIBBON GRAPHICS */
@@ -232,6 +246,14 @@
 
         <!-- RIGHT: CONTROLS -->
 <div class="bg-white rounded-[2.5rem] p-6 shadow-xl border border-slate-100 h-[700px] flex flex-col">
+    <!-- GENDER SELECTION -->
+<div class="mb-4">
+    <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Uniform Type</label>
+    <select id="genderSelect" onchange="updateGender(this.value)" class="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+        <option value="male">Male (Class A)</option>
+        <option value="female">Female (Class A)</option>
+    </select>
+</div>
     <div class="flex p-1.5 bg-slate-100/80 rounded-2xl mb-6">
         <!-- Ribbons: Remains active -->
         <button id="btn-ribbons" onclick="setTab('ribbons')" class="flex-1 py-2.5 rounded-xl font-bold text-xs bg-white text-blue-600 shadow-sm transition-all">Ribbons</button>
@@ -346,7 +368,54 @@
             { id: 'a-jlab', name: 'JLAB' }
         ];
 
-        let state = { ribbons: new Map(), medals: new Set(), arcs: new Set(), tab: 'ribbons' };
+        let state = { 
+    ribbons: new Map(), 
+    medals: new Set(), 
+    arcs: new Set(), 
+    tab: 'ribbons',
+    gender: 'male' // New property
+};
+
+function updateGender(val) {
+    state.gender = val;
+    const mannequinImg = document.querySelector('.mannequin-img');
+    const ribContainer = document.getElementById('u-ribbons');
+    const medalContainer = document.getElementById('u-medals');
+    const arcContainer = document.getElementById('u-arcs');
+
+    if (val === 'female') {
+        // Switch Image
+        mannequinImg.src = 'assets/Female_Class_A.png';
+        mannequinImg.onerror = () => { mannequinImg.src = 'https://placehold.co/480x620/0f172a/f472b6?text=Female+Class+A'; };
+        
+        // Adjust Placement for Female Uniform (Centered on left/right side seams/buttons)
+        // Values are estimates based on standard female Class A alignment
+        ribContainer.style.top = '38%'; 
+        ribContainer.style.left = '68%';
+        
+        medalContainer.style.top = '43.5%';
+        medalContainer.style.left = '68%';
+        
+        arcContainer.style.top = '48%';
+        arcContainer.style.left = '32%';
+    } else {
+        // Switch back to Male
+        mannequinImg.src = 'assets/Male_Class_A.png';
+        mannequinImg.onerror = () => { mannequinImg.src = 'https://placehold.co/480x620/0f172a/3b82f6?text=Male+Class+A'; };
+        
+        // Reset to original Male positions
+        ribContainer.style.top = '30%';
+        ribContainer.style.left = '69.5%';
+        
+        medalContainer.style.top = '35.5%';
+        medalContainer.style.left = '69.5%';
+        
+        arcContainer.style.top = '35.5%';
+        arcContainer.style.left = '30.5%';
+    }
+    
+    updatePreview();
+}
 function enterApp() {
     const landing = document.getElementById('landing-page');
     const builder = document.getElementById('builder-content');
